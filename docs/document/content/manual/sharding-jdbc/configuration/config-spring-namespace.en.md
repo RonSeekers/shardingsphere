@@ -463,9 +463,12 @@ example: [shardingsphere-example](https://github.com/apache/incubator-shardingsp
                            http://shardingsphere.apache.org/schema/shardingsphere/orchestration/masterslave  
                            http://shardingsphere.apache.org/schema/shardingsphere/orchestration/masterslave/master-slave.xsd">
     
-    <reg:registry-center id="regCenter" type="zookeeper" server-lists="localhost:2181" namespace="orchestration-spring-namespace-demo" overwtite="false" />
-    <sharding:data-source id="shardingMasterSlaveDataSource" registry-center-ref="regCenter" />
-    <master-slave:data-source id="masterSlaveDataSource" registry-center-ref="regCenter" />
+    <util:properties id="instance-props">
+        <prop key="max-retries">3</prop>
+        <prop key="operation-timeout-milliseconds">3000</prop>
+    </util:properties>
+    <orchestraion:instance id="regCenter" orchestration-type="registry_center,config_center,metadata_center" instance-type="zookeeper" server-lists="localhost:2181" namespace="orchestration-spring-namespace-demo"
+                           props-ref="instance-props" />
 </beans>
 ```
 
@@ -728,7 +731,7 @@ Namespace: http://shardingsphere.apache.org/schema/shardingsphere/orchestration/
 | id                  | Attribute | ID                                                           |
 | data-source-ref (?) | Attribute | Orchestrated database id                                     |
 | registry-center-ref | Attribute | Registry center id                                           |
-| overwrite           | Attribute | Whether to overwrite local configurations with registry center configurations; if it can, each initialization should refer to local configurations; default means not to overwrite |
+| overwrite           | Attribute | Whether to overwrite local configurations with config center configurations; if it can, each initialization should refer to local configurations; default means not to overwrite |
 
 ### Read-Write Split + Orchestration
 
@@ -741,7 +744,7 @@ Namespace: http://shardingsphere.apache.org/schema/shardingsphere/orchestration/
 | id                  | Attribute | ID                                                          |
 | data-source-ref (?) | Attribute | The id of data source to be orchestrated                    |
 | registry-center-ref | Attribute | The id of registry center                                   |
-| overwrite           | Attribute | Use local configuration to overwrite registry center or not |
+| overwrite           | Attribute | Use local configuration to overwrite config center or not |
 
 ### Data Masking + Orchestration
 
@@ -754,7 +757,7 @@ Namespace: http://shardingsphere.apache.org/schema/shardingsphere/orchestration/
 | id                  | Attribute | ID                                                          |
 | data-source-ref (?) | Attribute | The id of data source to be orchestrated                    |
 | registry-center-ref | Attribute | The id of registry center                                   |
-| overwrite           | Attribute | Use local configuration to overwrite registry center or not |
+| overwrite           | Attribute | Use local configuration to overwrite config center or not |
 
 
 ### Orchestration registry center
@@ -766,10 +769,11 @@ Namespace: http://shardingsphere.apache.org/schema/shardingsphere/orchestration/
 | *Name*                             | *Type*    | *Description*                                                                   |
 | ---------------------------------- | --------- | ------------------------------------------------------------------------------- |
 | id                                 | Attribute | Spring Bean Id of registry center                                               |
-| type                               | Attribute | Registry center type. Example:zookeeper                                         |
-| server-lists                       | Attribute | Registry servers list, multiple split as comma. Example: host1:2181,host2:2181  |
-| namespace (?)                      | Attribute | Namespace of registry                                                           |
-| digest (?)                         | Attribute | Digest for registry. Default is not need digest                                 |
+| instance-type                      | Attribute | Center type. Example:zookeeper                                         |
+| orchestration-type                 | Attribute | The type of orchestration center: config_center or registry_center or metadata_center  |
+| server-lists                       | Attribute | Center servers list, multiple split as comma. Example: host1:2181,host2:2181  |
+| namespace (?)                      | Attribute | Namespace of center                                                           |
+| digest (?)                         | Attribute | Digest for center. Default is not need digest                                 |
 | operation-timeout-milliseconds (?) | Attribute | Operation timeout time in milliseconds, default value is 500 seconds            |
 | max-retries (?)                    | Attribute | Max number of times to retry, default value is 3                                |
 | retry-interval-milliseconds (?)    | Attribute | Time interval in milliseconds on each retry, default value is 500 milliseconds  |
